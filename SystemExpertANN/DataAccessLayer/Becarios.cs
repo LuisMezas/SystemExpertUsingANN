@@ -20,7 +20,7 @@ namespace DataAccessLayer
         public string ApellidoMaterno { get; set; }
         public int Edad { get; set; }
         public double Promedio { get; set; }
-        public bool AdeudaMaterias { get; set; }
+        public bool EsRegular { get; set; }
         public double IngresoMensual { get; set; }
         public bool EsBecadoProspera { get; set; }
         public bool Discapacidad { get; set; }

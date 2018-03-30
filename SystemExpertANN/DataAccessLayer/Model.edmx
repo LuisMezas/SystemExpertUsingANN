@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="BecariosDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="BecariosDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Becarios">
           <Key>
             <PropertyRef Name="Id_Becario" />
@@ -15,7 +15,7 @@
           <Property Name="ApellidoMaterno" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Edad" Type="int" Nullable="false" />
           <Property Name="Promedio" Type="float" Nullable="false" />
-          <Property Name="AdeudaMaterias" Type="bit" Nullable="false" />
+          <Property Name="EsRegular" Type="bit" Nullable="false" />
           <Property Name="IngresoMensual" Type="float" Nullable="false" />
           <Property Name="EsBecadoProspera" Type="bit" Nullable="false" />
           <Property Name="Discapacidad" Type="bit" Nullable="false" />
@@ -64,54 +64,62 @@
             <End Role="Becarios" EntitySet="Becarios" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="BecariosDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="BecariosDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Becarios" EntityType="BecariosDBModel.Becarios" />
+          <EntitySet Name="Municipio" EntityType="BecariosDBModel.Municipio" />
+          <EntitySet Name="sysdiagrams" EntityType="BecariosDBModel.sysdiagrams" />
+          <AssociationSet Name="FK_Becarios_Municipio" Association="BecariosDBModel.FK_Becarios_Municipio">
+            <End Role="Municipio" EntitySet="Municipio" />
+            <End Role="Becarios" EntitySet="Becarios" />
+          </AssociationSet>
+        </EntityContainer>
         <EntityType Name="Becarios">
           <Key>
             <PropertyRef Name="Id_Becario" />
           </Key>
           <Property Name="Id_Becario" Type="Int32" Nullable="false" />
-          <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="ApellidoPaterno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="ApellidoMaterno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Nombre" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ApellidoPaterno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ApellidoMaterno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Edad" Type="Int32" Nullable="false" />
           <Property Name="Promedio" Type="Double" Nullable="false" />
-          <Property Name="AdeudaMaterias" Type="Boolean" Nullable="false" />
+          <Property Name="EsRegular" Type="Boolean" Nullable="false" />
           <Property Name="IngresoMensual" Type="Double" Nullable="false" />
           <Property Name="EsBecadoProspera" Type="Boolean" Nullable="false" />
           <Property Name="Discapacidad" Type="Boolean" Nullable="false" />
           <Property Name="Id_Municipio" Type="Int32" Nullable="false" />
           <Property Name="EsBecado" Type="Boolean" />
           <Property Name="FechaEvaluacionbeca" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="Municipio" Relationship="Self.FK_Becarios_Municipio" FromRole="Becarios" ToRole="Municipio" />
+          <NavigationProperty Name="Municipio" Relationship="BecariosDBModel.FK_Becarios_Municipio" FromRole="Becarios" ToRole="Municipio" />
         </EntityType>
         <EntityType Name="Municipio">
           <Key>
             <PropertyRef Name="Id_Municipio" />
           </Key>
           <Property Name="Id_Municipio" Type="Int32" Nullable="false" />
-          <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="NombreMunicipio" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Estado" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="NombreMunicipio" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Prioridad" Type="Boolean" Nullable="false" />
           <Property Name="FechaModificacionValores" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="Becarios" Relationship="Self.FK_Becarios_Municipio" FromRole="Municipio" ToRole="Becarios" />
+          <NavigationProperty Name="Becarios" Relationship="BecariosDBModel.FK_Becarios_Municipio" FromRole="Municipio" ToRole="Becarios" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
             <PropertyRef Name="diagram_id" />
           </Key>
-          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
           <Property Name="principal_id" Type="Int32" Nullable="false" />
           <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="version" Type="Int32" />
           <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <Association Name="FK_Becarios_Municipio">
-          <End Role="Municipio" Type="Self.Municipio" Multiplicity="1" />
-          <End Role="Becarios" Type="Self.Becarios" Multiplicity="*" />
+          <End Type="BecariosDBModel.Municipio" Role="Municipio" Multiplicity="1" />
+          <End Type="BecariosDBModel.Becarios" Role="Becarios" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Municipio">
               <PropertyRef Name="Id_Municipio" />
@@ -121,15 +129,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="BecariosDBEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Becarios" EntityType="Self.Becarios" />
-          <EntitySet Name="Municipio" EntityType="Self.Municipio" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
-          <AssociationSet Name="FK_Becarios_Municipio" Association="Self.FK_Becarios_Municipio">
-            <End Role="Municipio" EntitySet="Municipio" />
-            <End Role="Becarios" EntitySet="Becarios" />
-          </AssociationSet>
-        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -139,41 +138,41 @@
           <EntitySetMapping Name="Becarios">
             <EntityTypeMapping TypeName="BecariosDBModel.Becarios">
               <MappingFragment StoreEntitySet="Becarios">
-                <ScalarProperty Name="Id_Becario" ColumnName="Id_Becario" />
-                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
-                <ScalarProperty Name="ApellidoPaterno" ColumnName="ApellidoPaterno" />
-                <ScalarProperty Name="ApellidoMaterno" ColumnName="ApellidoMaterno" />
-                <ScalarProperty Name="Edad" ColumnName="Edad" />
-                <ScalarProperty Name="Promedio" ColumnName="Promedio" />
-                <ScalarProperty Name="AdeudaMaterias" ColumnName="AdeudaMaterias" />
-                <ScalarProperty Name="IngresoMensual" ColumnName="IngresoMensual" />
-                <ScalarProperty Name="EsBecadoProspera" ColumnName="EsBecadoProspera" />
-                <ScalarProperty Name="Discapacidad" ColumnName="Discapacidad" />
-                <ScalarProperty Name="Id_Municipio" ColumnName="Id_Municipio" />
-                <ScalarProperty Name="EsBecado" ColumnName="EsBecado" />
                 <ScalarProperty Name="FechaEvaluacionbeca" ColumnName="FechaEvaluacionbeca" />
+                <ScalarProperty Name="EsBecado" ColumnName="EsBecado" />
+                <ScalarProperty Name="Id_Municipio" ColumnName="Id_Municipio" />
+                <ScalarProperty Name="Discapacidad" ColumnName="Discapacidad" />
+                <ScalarProperty Name="EsBecadoProspera" ColumnName="EsBecadoProspera" />
+                <ScalarProperty Name="IngresoMensual" ColumnName="IngresoMensual" />
+                <ScalarProperty Name="EsRegular" ColumnName="EsRegular" />
+                <ScalarProperty Name="Promedio" ColumnName="Promedio" />
+                <ScalarProperty Name="Edad" ColumnName="Edad" />
+                <ScalarProperty Name="ApellidoMaterno" ColumnName="ApellidoMaterno" />
+                <ScalarProperty Name="ApellidoPaterno" ColumnName="ApellidoPaterno" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Id_Becario" ColumnName="Id_Becario" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Municipio">
             <EntityTypeMapping TypeName="BecariosDBModel.Municipio">
               <MappingFragment StoreEntitySet="Municipio">
-                <ScalarProperty Name="Id_Municipio" ColumnName="Id_Municipio" />
-                <ScalarProperty Name="Estado" ColumnName="Estado" />
-                <ScalarProperty Name="NombreMunicipio" ColumnName="NombreMunicipio" />
-                <ScalarProperty Name="Prioridad" ColumnName="Prioridad" />
                 <ScalarProperty Name="FechaModificacionValores" ColumnName="FechaModificacionValores" />
+                <ScalarProperty Name="Prioridad" ColumnName="Prioridad" />
+                <ScalarProperty Name="NombreMunicipio" ColumnName="NombreMunicipio" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="Id_Municipio" ColumnName="Id_Municipio" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="sysdiagrams">
             <EntityTypeMapping TypeName="BecariosDBModel.sysdiagrams">
               <MappingFragment StoreEntitySet="sysdiagrams">
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
-                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
-                <ScalarProperty Name="version" ColumnName="version" />
                 <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

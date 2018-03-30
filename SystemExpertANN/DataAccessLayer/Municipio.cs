@@ -28,5 +28,9 @@ namespace DataAccessLayer
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Becarios> Becarios { get; set; }
+        public override string ToString()
+        {
+            return NombreMunicipio;
+        }
     }
 }
