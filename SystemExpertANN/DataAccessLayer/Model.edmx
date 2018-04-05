@@ -9,7 +9,7 @@
           <Key>
             <PropertyRef Name="Id_Becario" />
           </Key>
-          <Property Name="Id_Becario" Type="int" Nullable="false" />
+          <Property Name="Id_Becario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Nombre" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="ApellidoPaterno" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="ApellidoMaterno" Type="varchar" MaxLength="50" Nullable="false" />
@@ -27,7 +27,7 @@
           <Key>
             <PropertyRef Name="Id_Municipio" />
           </Key>
-          <Property Name="Id_Municipio" Type="int" Nullable="false" />
+          <Property Name="Id_Municipio" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Estado" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="NombreMunicipio" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Prioridad" Type="bit" Nullable="false" />
@@ -81,7 +81,7 @@
           <Key>
             <PropertyRef Name="Id_Becario" />
           </Key>
-          <Property Name="Id_Becario" Type="Int32" Nullable="false" />
+          <Property Name="Id_Becario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Nombre" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ApellidoPaterno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ApellidoMaterno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -100,7 +100,7 @@
           <Key>
             <PropertyRef Name="Id_Municipio" />
           </Key>
-          <Property Name="Id_Municipio" Type="Int32" Nullable="false" />
+          <Property Name="Id_Municipio" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Estado" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="NombreMunicipio" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Prioridad" Type="Boolean" Nullable="false" />

@@ -12,6 +12,8 @@ using System.Linq.Expressions;
 using AForge.Neuro.Learning;
 using System.Threading;
 using DataAccessLayer;
+using System.IO;
+using System.Collections;
 
 namespace SystemExpertANN
 {
@@ -27,14 +29,20 @@ namespace SystemExpertANN
         public InfoModel formInputs = new InfoModel();
         public double[] _Output { get; set; }
 
-        public Boolean needtoStop { get; set; }
+        private Thread workerThread = null;
+        private volatile bool needToStop = false;
+
+        private double learningRate = 0.1;
+        private double momentum = 0.0;
+        private double sigmoidAlphaValue = 2.0;
+        private double learningErrorLimit = 0.1;
+
+        private Boolean ExisteBecario = false;
 
         public MainForm()
         {
             InitializeComponent();
-            _Function = new ThresholdFunction();
-            _Network = new ActivationNetwork(_Function, 7, 2);
-            ANNLearning_BackPropagation();
+            
         }
 
         private void btnConsultarInfo_Click(object sender, EventArgs e)
@@ -50,7 +58,15 @@ namespace SystemExpertANN
             {
                 PrepareFormInputs();
                 _Inputs = Parse(formInputs);
-                EvaluateInputsForANN();
+                FlagExisteBecario();
+                if (ExisteBecario == true)
+                {
+                    MessageBox.Show("Ya existe un registro de este becario."
+                        , "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                EvaluateInputsForANN();                
+                InsertBecario();
                 ResetObjects();
             }
             catch (Exception ex)
@@ -59,8 +75,10 @@ namespace SystemExpertANN
             }
         }
 
+        
         private void MainForm_Load(object sender, EventArgs e)
         {
+            ANNLearning_BackPropagation();
             var Query = db.Municipio.ToList();
             cbMunicipio.DataSource = Query;
             cbMunicipio.ValueMember = "Id_Municipio";
@@ -99,7 +117,59 @@ namespace SystemExpertANN
             }
         }
 
-        private void ValidateInputs()
+        void InsertBecario()
+        {
+            Becarios model = new Becarios();
+            if (_Output[0] <= 0)
+            {
+                model.Nombre = formInputs.Nombre;
+                model.ApellidoPaterno = formInputs.ApellidoP;
+                model.ApellidoMaterno = formInputs.ApellidoM;
+                model.Edad = formInputs.Edad;
+                model.EsBecado = false;
+                model.EsBecadoProspera = formInputs.CuentaPROSPERA;
+                model.EsRegular = formInputs.EsRegular;
+                model.FechaEvaluacionbeca = DateTime.Now.Date;
+                model.Discapacidad = formInputs.Discapacidad;
+                model.Id_Municipio = formInputs.Id_Municipio;
+                model.IngresoMensual = formInputs.IngresoMensualFamiliar;
+                model.Promedio = formInputs.Promedio;
+            }
+            else
+            {
+                model.Nombre = formInputs.Nombre;
+                model.ApellidoPaterno = formInputs.ApellidoP;
+                model.ApellidoMaterno = formInputs.ApellidoM;
+                model.Edad = formInputs.Edad;
+                model.EsBecado = true;
+                model.EsBecadoProspera = formInputs.CuentaPROSPERA;
+                model.EsRegular = formInputs.EsRegular;
+                model.FechaEvaluacionbeca = DateTime.Now.Date;
+                model.Discapacidad = formInputs.Discapacidad;
+                model.Id_Municipio = formInputs.Id_Municipio;
+                model.IngresoMensual = formInputs.IngresoMensualFamiliar;
+                model.Promedio = formInputs.Promedio;
+            }
+            db.Becarios.Add(model);
+            db.SaveChanges();
+        }
+
+        void FlagExisteBecario()
+        {
+            var query = db.Becarios.Where(x => x.Nombre.ToUpper() == formInputs.Nombre.ToUpper())
+                .Where(x => x.ApellidoPaterno.ToUpper() == formInputs.ApellidoP.ToUpper())
+                .Where(x => x.ApellidoMaterno.ToUpper() == formInputs.ApellidoM.ToUpper()).FirstOrDefault();
+            if(query == null)
+            {
+                ExisteBecario = false;
+            }
+            else
+            {
+                ExisteBecario = true;
+            }
+        }
+
+        void ValidateInputs()
         {
             if (string.IsNullOrWhiteSpace(txtNombre.Text)
                 || string.IsNullOrWhiteSpace(txtApellidoP.Text)
@@ -114,52 +184,54 @@ namespace SystemExpertANN
 
         void ANNLearning_BackPropagation()
         {
-            //initialize input and output values
-                double[][] input = new double[14][] {
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 0, 0, 0, 1, 1, 1},
-                    new double[] {0, 0, 0, 0, 1, 1, 1},
-                    new double[] {0, 0, 0, 0, 1, 1, 1},
-                    new double[] {0, 0, 0, 0, 0, 0, 0},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 0, 0, 0, 1, 1, 1},
-                    new double[] {0, 0, 0, 0, 1, 1, 1},
-                    new double[] {0, 0, 0, 0, 1, 1, 1},
-                    new double[] {0, 0, 0, 0, 0, 0, 0}
-            };
+            ////initialize input and output values
+            //    double[][] input = new double[14][] {
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 0, 0, 0, 1, 1, 1},
+            //        new double[] {0, 0, 0, 0, 1, 1, 1},
+            //        new double[] {0, 0, 0, 0, 1, 1, 1},
+            //        new double[] {0, 0, 0, 0, 0, 0, 0},
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 0, 0, 0, 1, 1, 1},
+            //        new double[] {0, 0, 0, 0, 1, 1, 1},
+            //        new double[] {0, 0, 0, 0, 1, 1, 1},
+            //        new double[] {0, 0, 0, 0, 0, 0, 0}
+            //};
 
-            double[][] output = new double[14][] {
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {0},
-                    new double[] {0},
-                    new double[] {0},
-                    new double[] {0},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {0},
-                    new double[] {0},
-                    new double[] {0},
-                    new double[] {0}
-            };
-            //create neural network
-           _Network = new ActivationNetwork(
-               _Function,
-               7, // seven inputs in the network
-               7, // seven neurons in the first layer
-               1); // one neuron in the second layer
+            //double[][] output = new double[14][] {
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {0},
+            //        new double[] {0},
+            //        new double[] {0},
+            //        new double[] {0},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {0},
+            //        new double[] {0},
+            //        new double[] {0},
+            //        new double[] {0}
+            //};
+            //instantiate Threshold Function
+            // _Function = new ThresholdFunction();
+            // //create neural network
+            //_Network = new ActivationNetwork(
+            //    _Function,
+            //    7, // seven inputs in the network
+            //    7, // seven neurons in the first layer
+            //    1); // one neuron in the second layer
 
-            //create teacher
-            _Teacher = new BackPropagationLearning(_Network);
-            // loop
-            _Teacher.LearningRate = 0.0001;
-            _Teacher.Momentum = 0.01;
+            // //create teacher
+            // _Teacher = new BackPropagationLearning(_Network);
+            // // loop
+            // _Teacher.LearningRate = 0.0001;
+            // _Teacher.Momentum = 0.01;
             //while (!needToStop)
             //{
             //    // run epoch of learning procedure
@@ -173,41 +245,135 @@ namespace SystemExpertANN
             //    if (error <= 0.1)
             //        break;
             //}
-            int iteration = 1;
-            while(iteration < 10000)
-            {
-                double error = _Teacher.RunEpoch(input, output);
-                iteration++;
-            }
-            //    double[][] input = new double[7][] {
-            //        new double[] {1, 1, 1, 1, 1, 1, 1},
-            //        new double[] {1, 1, 1, 1, 1, 1, 1},
-            //        new double[] {1, 1, 1, 1, 1, 1, 1},
-            //        new double[] {-1, -1, -1, -1, 1, 1, 1},
-            //        new double[] {-1, -1, -1, -1, 1, 1, 1},
-            //        new double[] {-1, -1, -1, -1, -1, -1, 1},
-            //        new double[] {-1, -1, -1, -1, -1, -1, -1}
-            //};
+            //int iteration = 1;
+            //while(!needtoStop)
+            //{
+            //    double error = _Teacher.RunEpoch(input, output);
+            //    if (error <= 0.1)
+            //        break;
+            //    iteration++;
+            //}            
 
-            //    double[][] output = new double[7][] {
-            //        new double[] {1},
-            //        new double[] {1},
-            //        new double[] {1},
-            //        new double[] {-1},
-            //        new double[] {-1},
-            //        new double[] {-1},
-            //        new double[] {-1},
-            //};
-            //    _Network = new ActivationNetwork(new BipolarSigmoidFunction(2), 7, 7, 1);
-            //    _Teacher = new BackPropagationLearning( _Network );
-            //    _Teacher.LearningRate = 0.1;
-            //    _Teacher.Momentum = 0;
-            //    while(!needtoStop)
-            //    {
-            //        double error = _Teacher.RunEpoch(input, output);
-            //        if (error <= 0.1)
-            //            break;
-            //    }
+            double[][] input = new double[30][] {
+                //INPUTS for OUTPUT 1
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {-1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, -1, 1, 1, 1, 1},
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {-1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, -1, 1, 1, 1, 1},
+                    new double[] {-1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {1, 1, -1, 1, 1, 1, 1},
+                    new double[] {1, 1, 1, 1, 1, 1, 1},
+                    new double[] {-1, 1, 1, 1, 1, 1, 1},
+                    //INPUTS for OUTPUT -1
+                    new double[] {-1, 1, 1, 1, -1, -1, -1},
+                    new double[] {1, -1, 1, -1, -1, -1, -1},
+                    new double[] {1, -1, -1, -1, -1, -1, -1},
+                    new double[] {1, -1, 1, -1, -1, -1, -1},
+                    new double[] {-1, -1, 1, -1, -1, -1, -1},
+                    new double[] {1, -1, 1, -1, -1, -1, -1},
+                    new double[] {1, -1, -1, -1, -1, -1, -1},
+                    new double[] {-1, -1, 1, -1, -1, -1, -1},
+                    new double[] {1, -1, 1, -1, -1, -1, -1},
+                    new double[] {1, -1, -1, -1, -1, -1, -1},
+                    new double[] {-1, -1, 1, -1, -1, -1, -1},
+                    new double[] {1, -1, 1, -1, -1, -1, -1},
+                    new double[] {1, -1, -1, -1, -1, -1, -1},
+                    new double[] {-1, -1, -1, -1, -1, -1, -1},
+                    new double[] {-1, -1, -1, -1, -1, -1, -1}
+            };
+
+            double[][] output = new double[30][] {
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1},
+                    new double[] {-1}
+            };
+            _Network = new ActivationNetwork(new BipolarSigmoidFunction(sigmoidAlphaValue), 7, 7, 1);
+            _Teacher = new BackPropagationLearning(_Network);
+            _Teacher.LearningRate = learningRate;
+            _Teacher.Momentum = momentum;
+
+            int iteration = 1;
+            StreamWriter errorsFile = null;
+            try
+            {
+                errorsFile = File.CreateText("Errors.csv");
+                // errors list
+                ArrayList errorsList = new ArrayList();
+                while (!needToStop)
+                {
+
+                    // run epoch of learning procedure
+                    double error = _Teacher.RunEpoch(input, output);
+                    errorsList.Add(error);
+
+                    // save current error
+                    if (errorsFile != null)
+                    {
+                        errorsFile.WriteLine(error);
+                    }
+
+                    // show current iteration & error
+                    currentIterationBox.Text = iteration.ToString();
+                    currentErrorBox.Text = error.ToString();
+                    iteration++;
+
+                    // check if we need to stop
+                    if (iteration > 5000)
+                        break;
+                }
+                double[,] errors = new double[errorsList.Count, 2];
+
+                for (int i = 0, n = errorsList.Count; i < n; i++)
+                {
+                    errors[i, 0] = i;
+                    errors[i, 1] = (double)errorsList[i];
+                }
+
+            }
+            catch (IOException)
+            {
+                MessageBox.Show("Failed writing file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // close files
+                if (errorsFile != null)
+                    errorsFile.Close();
+            }
             try
                 {
                 _Network.Save("Network");
@@ -221,8 +387,15 @@ namespace SystemExpertANN
 
         void EvaluateInputsForANN()
         {
-                _Output = _Network.Compute(_Inputs);
-            MessageBox.Show("Muchas gracias. +" + _Output.GetValue(0).ToString(), "Ok", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            _Output = _Network.Compute(_Inputs);
+            if(_Output[0] <= 0)
+            {
+                MessageBox.Show("No es apto para una beca.", "Ok", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("El aplicante es apto para una beca.", "Ok", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         void PrepareFormInputs()
@@ -251,7 +424,7 @@ namespace SystemExpertANN
         {
             double[] Vector = new double[7]
             {
-                0,0,0,0,0,0,0
+                -1,-1,-1,-1,-1,-1,-1
             };
             if (model.Edad >= 18 && model.Edad <= 24)
             {
@@ -303,6 +476,7 @@ namespace SystemExpertANN
                 _Inputs.SetValue(0, i);
             }
             btnEnviarInfo.Enabled = false;
+            formInputs = null;
         }
 
         private void txtNombre_TextChanged(object sender, EventArgs e)
@@ -354,6 +528,17 @@ namespace SystemExpertANN
                 )
             {
                 btnEnviarInfo.Enabled = true;
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // check if worker thread is running
+            if ((workerThread != null) && (workerThread.IsAlive))
+            {
+                needToStop = true;
+                while (!workerThread.Join(100))
+                    Application.DoEvents();
             }
         }
     }

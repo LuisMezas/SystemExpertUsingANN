@@ -23,13 +23,19 @@ namespace SystemExpertANN
 
         private void QueryForm_Load(object sender, EventArgs e)
         {
-            var Query = db.Becarios.Include(x => x.Municipio).OrderBy(x => x.Promedio).ToList();
+            var Query = db.Becarios.Include(x => x.Municipio).OrderBy(x => x.Id_Becario).ToList();
             dgvConsulta.DataSource = Query;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            var Query = db.Becarios.Include(x => x.Municipio).OrderBy(x => x.Promedio).ToList();
+            dgvConsulta.DataSource = Query;
         }
     }
 }

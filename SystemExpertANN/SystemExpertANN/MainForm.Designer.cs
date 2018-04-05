@@ -32,27 +32,29 @@
             this.btnConsultarInfo = new System.Windows.Forms.Button();
             this.btnEnviarInfo = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.cbCuentaPROSPERA = new System.Windows.Forms.CheckBox();
             this.txtIngresoMensual = new System.Windows.Forms.TextBox();
             this.cbMunicipio = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.cbDiscapacidad = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cbRegular = new System.Windows.Forms.CheckBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
             this.nudPromedio = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.cbEdad = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.cbDiscapacidad = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtNombre = new System.Windows.Forms.TextBox();
             this.txtApellidoP = new System.Windows.Forms.TextBox();
             this.txtApellidoM = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.cbRegular = new System.Windows.Forms.CheckBox();
-            this.cbCuentaPROSPERA = new System.Windows.Forms.CheckBox();
+            this.currentIterationBox = new System.Windows.Forms.TextBox();
+            this.currentErrorBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -110,6 +112,15 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Datos socioeconómicos";
             // 
+            // cbCuentaPROSPERA
+            // 
+            this.cbCuentaPROSPERA.AutoSize = true;
+            this.cbCuentaPROSPERA.Location = new System.Drawing.Point(209, 70);
+            this.cbCuentaPROSPERA.Name = "cbCuentaPROSPERA";
+            this.cbCuentaPROSPERA.Size = new System.Drawing.Size(15, 14);
+            this.cbCuentaPROSPERA.TabIndex = 15;
+            this.cbCuentaPROSPERA.UseVisualStyleBackColor = true;
+            // 
             // txtIngresoMensual
             // 
             this.txtIngresoMensual.Location = new System.Drawing.Point(200, 35);
@@ -156,15 +167,6 @@
             this.label5.TabIndex = 9;
             this.label5.Text = "Ingreso mensual familiar:";
             // 
-            // cbDiscapacidad
-            // 
-            this.cbDiscapacidad.AutoSize = true;
-            this.cbDiscapacidad.Location = new System.Drawing.Point(209, 221);
-            this.cbDiscapacidad.Name = "cbDiscapacidad";
-            this.cbDiscapacidad.Size = new System.Drawing.Size(15, 14);
-            this.cbDiscapacidad.TabIndex = 0;
-            this.cbDiscapacidad.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.cbRegular);
@@ -188,6 +190,33 @@
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Datos generales";
+            // 
+            // cbRegular
+            // 
+            this.cbRegular.AutoSize = true;
+            this.cbRegular.Location = new System.Drawing.Point(209, 189);
+            this.cbRegular.Name = "cbRegular";
+            this.cbRegular.Size = new System.Drawing.Size(15, 14);
+            this.cbRegular.TabIndex = 14;
+            this.cbRegular.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(7, 185);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(144, 18);
+            this.label10.TabIndex = 13;
+            this.label10.Text = "¿Es alumno regular?";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 218);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(197, 18);
+            this.label9.TabIndex = 12;
+            this.label9.Text = "¿Tiene alguna discapacidad?";
             // 
             // nudPromedio
             // 
@@ -257,6 +286,15 @@
             this.label4.TabIndex = 8;
             this.label4.Text = "Edad:";
             // 
+            // cbDiscapacidad
+            // 
+            this.cbDiscapacidad.AutoSize = true;
+            this.cbDiscapacidad.Location = new System.Drawing.Point(209, 221);
+            this.cbDiscapacidad.Name = "cbDiscapacidad";
+            this.cbDiscapacidad.Size = new System.Drawing.Size(15, 14);
+            this.cbDiscapacidad.TabIndex = 0;
+            this.cbDiscapacidad.UseVisualStyleBackColor = true;
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -286,6 +324,7 @@
             // 
             // txtNombre
             // 
+            this.txtNombre.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.txtNombre.Location = new System.Drawing.Point(137, 32);
             this.txtNombre.Name = "txtNombre";
             this.txtNombre.Size = new System.Drawing.Size(323, 24);
@@ -296,6 +335,7 @@
             // 
             // txtApellidoP
             // 
+            this.txtApellidoP.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.txtApellidoP.Location = new System.Drawing.Point(137, 59);
             this.txtApellidoP.Name = "txtApellidoP";
             this.txtApellidoP.Size = new System.Drawing.Size(323, 24);
@@ -306,6 +346,7 @@
             // 
             // txtApellidoM
             // 
+            this.txtApellidoM.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.txtApellidoM.Location = new System.Drawing.Point(137, 85);
             this.txtApellidoM.Name = "txtApellidoM";
             this.txtApellidoM.Size = new System.Drawing.Size(323, 24);
@@ -314,52 +355,35 @@
             this.txtApellidoM.TextChanged += new System.EventHandler(this.txtApellidoM_TextChanged);
             this.txtApellidoM.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtApellidoM_KeyPress);
             // 
-            // label9
+            // currentIterationBox
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 218);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(197, 18);
-            this.label9.TabIndex = 12;
-            this.label9.Text = "¿Tiene alguna discapacidad?";
+            this.currentIterationBox.Location = new System.Drawing.Point(12, 492);
+            this.currentIterationBox.Name = "currentIterationBox";
+            this.currentIterationBox.Size = new System.Drawing.Size(185, 20);
+            this.currentIterationBox.TabIndex = 16;
+            this.currentIterationBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
-            // label10
+            // currentErrorBox
             // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 185);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(144, 18);
-            this.label10.TabIndex = 13;
-            this.label10.Text = "¿Es alumno regular?";
-            // 
-            // cbRegular
-            // 
-            this.cbRegular.AutoSize = true;
-            this.cbRegular.Location = new System.Drawing.Point(209, 189);
-            this.cbRegular.Name = "cbRegular";
-            this.cbRegular.Size = new System.Drawing.Size(15, 14);
-            this.cbRegular.TabIndex = 14;
-            this.cbRegular.UseVisualStyleBackColor = true;
-            // 
-            // cbCuentaPROSPERA
-            // 
-            this.cbCuentaPROSPERA.AutoSize = true;
-            this.cbCuentaPROSPERA.Location = new System.Drawing.Point(209, 70);
-            this.cbCuentaPROSPERA.Name = "cbCuentaPROSPERA";
-            this.cbCuentaPROSPERA.Size = new System.Drawing.Size(15, 14);
-            this.cbCuentaPROSPERA.TabIndex = 15;
-            this.cbCuentaPROSPERA.UseVisualStyleBackColor = true;
+            this.currentErrorBox.Location = new System.Drawing.Point(306, 492);
+            this.currentErrorBox.Name = "currentErrorBox";
+            this.currentErrorBox.Size = new System.Drawing.Size(185, 20);
+            this.currentErrorBox.TabIndex = 17;
+            this.currentErrorBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(504, 499);
+            this.ClientSize = new System.Drawing.Size(506, 538);
+            this.Controls.Add(this.currentErrorBox);
+            this.Controls.Add(this.currentIterationBox);
             this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Sistema Experto";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
@@ -368,6 +392,7 @@
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPromedio)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -398,6 +423,8 @@
         private System.Windows.Forms.CheckBox cbRegular;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox currentIterationBox;
+        private System.Windows.Forms.TextBox currentErrorBox;
     }
 }
 
