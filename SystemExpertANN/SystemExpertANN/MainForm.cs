@@ -75,7 +75,6 @@ namespace SystemExpertANN
             }
         }
 
-        
         private void MainForm_Load(object sender, EventArgs e)
         {
             ANNLearning_BackPropagation();
@@ -240,7 +239,7 @@ namespace SystemExpertANN
             //    // ...
             //}
             //while (!needtoStop)
-            //{
+            //{ 
             //    double error = _Teacher.RunEpoch(input, output);
             //    if (error <= 0.1)
             //        break;
@@ -476,7 +475,16 @@ namespace SystemExpertANN
                 _Inputs.SetValue(0, i);
             }
             btnEnviarInfo.Enabled = false;
-            formInputs = null;
+            formInputs.ApellidoM = "";
+            formInputs.ApellidoP = "";
+            formInputs.CuentaPROSPERA = false;
+            formInputs.Discapacidad = false;
+            formInputs.Edad = 26;
+            formInputs.EsRegular = false;
+            formInputs.IngresoMensualFamiliar = 0;
+            formInputs.Nombre = "";
+            formInputs.Promedio = 6.0;
+            formInputs.Id_Municipio = 1;
         }
 
         private void txtNombre_TextChanged(object sender, EventArgs e)
