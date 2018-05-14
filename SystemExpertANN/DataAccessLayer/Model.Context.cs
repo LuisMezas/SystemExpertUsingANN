@@ -27,6 +27,5 @@ namespace DataAccessLayer
     
         public virtual DbSet<Becarios> Becarios { get; set; }
         public virtual DbSet<Municipio> Municipio { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
     }
 }

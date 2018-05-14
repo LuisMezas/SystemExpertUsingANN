@@ -14,6 +14,7 @@ using System.Threading;
 using DataAccessLayer;
 using System.IO;
 using System.Collections;
+using System.Globalization;
 
 namespace SystemExpertANN
 {
@@ -35,14 +36,13 @@ namespace SystemExpertANN
         private double learningRate = 0.1;
         private double momentum = 0.0;
         private double sigmoidAlphaValue = 2.0;
-        private double learningErrorLimit = 0.1;
 
         private Boolean ExisteBecario = false;
 
         public MainForm()
         {
             InitializeComponent();
-            
+
         }
 
         private void btnConsultarInfo_Click(object sender, EventArgs e)
@@ -65,7 +65,7 @@ namespace SystemExpertANN
                         , "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                EvaluateInputsForANN();                
+                EvaluateInputsForANN();
                 InsertBecario();
                 ResetObjects();
             }
@@ -158,7 +158,7 @@ namespace SystemExpertANN
             var query = db.Becarios.Where(x => x.Nombre.ToUpper() == formInputs.Nombre.ToUpper())
                 .Where(x => x.ApellidoPaterno.ToUpper() == formInputs.ApellidoP.ToUpper())
                 .Where(x => x.ApellidoMaterno.ToUpper() == formInputs.ApellidoM.ToUpper()).FirstOrDefault();
-            if(query == null)
+            if (query == null)
             {
                 ExisteBecario = false;
             }
@@ -180,147 +180,666 @@ namespace SystemExpertANN
                 MessageBox.Show("Verifique que no hay datos en blanco.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
+        
         void ANNLearning_BackPropagation()
         {
-            ////initialize input and output values
-            //    double[][] input = new double[14][] {
+
+            //double[][] input = new double[30][] {
+            //    //INPUTS for OUTPUT 1
             //        new double[] {1, 1, 1, 1, 1, 1, 1},
             //        new double[] {1, 1, 1, 1, 1, 1, 1},
             //        new double[] {1, 1, 1, 1, 1, 1, 1},
-            //        new double[] {1, 0, 0, 0, 1, 1, 1},
-            //        new double[] {0, 0, 0, 0, 1, 1, 1},
-            //        new double[] {0, 0, 0, 0, 1, 1, 1},
-            //        new double[] {0, 0, 0, 0, 0, 0, 0},
+            //        new double[] {-1, 1, 1, 1, 1, 1, 1},
             //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 1, -1, 1, 1, 1, 1},
             //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {-1, 1, 1, 1, 1, 1, 1},
             //        new double[] {1, 1, 1, 1, 1, 1, 1},
-            //        new double[] {1, 0, 0, 0, 1, 1, 1},
-            //        new double[] {0, 0, 0, 0, 1, 1, 1},
-            //        new double[] {0, 0, 0, 0, 1, 1, 1},
-            //        new double[] {0, 0, 0, 0, 0, 0, 0}
+            //        new double[] {1, 1, -1, 1, 1, 1, 1},
+            //        new double[] {-1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {1, 1, -1, 1, 1, 1, 1},
+            //        new double[] {1, 1, 1, 1, 1, 1, 1},
+            //        new double[] {-1, 1, 1, 1, 1, 1, 1},
+            //        //INPUTS for OUTPUT -1
+            //        new double[] {-1, 1, 1, 1, -1, -1, -1},
+            //        new double[] {1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {1, -1, -1, -1, -1, -1, -1},
+            //        new double[] {1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {-1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {1, -1, -1, -1, -1, -1, -1},
+            //        new double[] {-1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {1, -1, -1, -1, -1, -1, -1},
+            //        new double[] {-1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {1, -1, 1, -1, -1, -1, -1},
+            //        new double[] {1, -1, -1, -1, -1, -1, -1},
+            //        new double[] {-1, -1, -1, -1, -1, -1, -1},
+            //        new double[] {-1, -1, -1, -1, -1, -1, -1}
             //};
 
-            //double[][] output = new double[14][] {
+            //double[][] output = new double[30][] {
             //        new double[] {1},
             //        new double[] {1},
             //        new double[] {1},
-            //        new double[] {0},
-            //        new double[] {0},
-            //        new double[] {0},
-            //        new double[] {0},
             //        new double[] {1},
             //        new double[] {1},
             //        new double[] {1},
-            //        new double[] {0},
-            //        new double[] {0},
-            //        new double[] {0},
-            //        new double[] {0}
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1},
+            //        new double[] {-1}
             //};
-            //instantiate Threshold Function
-            // _Function = new ThresholdFunction();
-            // //create neural network
-            //_Network = new ActivationNetwork(
-            //    _Function,
-            //    7, // seven inputs in the network
-            //    7, // seven neurons in the first layer
-            //    1); // one neuron in the second layer
 
-            // //create teacher
-            // _Teacher = new BackPropagationLearning(_Network);
-            // // loop
-            // _Teacher.LearningRate = 0.0001;
-            // _Teacher.Momentum = 0.01;
-            //while (!needToStop)
-            //{
-            //    // run epoch of learning procedure
-            //    double error = teacher.RunEpoch(input, output);
-            //    // check error value to see if we need to stop
-            //    // ...
-            //}
-            //while (!needtoStop)
-            //{ 
-            //    double error = _Teacher.RunEpoch(input, output);
-            //    if (error <= 0.1)
-            //        break;
-            //}
-            //int iteration = 1;
-            //while(!needtoStop)
-            //{
-            //    double error = _Teacher.RunEpoch(input, output);
-            //    if (error <= 0.1)
-            //        break;
-            //    iteration++;
-            //}            
-
-            double[][] input = new double[30][] {
-                //INPUTS for OUTPUT 1
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {-1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, -1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {-1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, -1, 1, 1, 1, 1},
-                    new double[] {-1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {1, 1, -1, 1, 1, 1, 1},
-                    new double[] {1, 1, 1, 1, 1, 1, 1},
-                    new double[] {-1, 1, 1, 1, 1, 1, 1},
-                    //INPUTS for OUTPUT -1
-                    new double[] {-1, 1, 1, 1, -1, -1, -1},
-                    new double[] {1, -1, 1, -1, -1, -1, -1},
-                    new double[] {1, -1, -1, -1, -1, -1, -1},
-                    new double[] {1, -1, 1, -1, -1, -1, -1},
-                    new double[] {-1, -1, 1, -1, -1, -1, -1},
-                    new double[] {1, -1, 1, -1, -1, -1, -1},
-                    new double[] {1, -1, -1, -1, -1, -1, -1},
-                    new double[] {-1, -1, 1, -1, -1, -1, -1},
-                    new double[] {1, -1, 1, -1, -1, -1, -1},
-                    new double[] {1, -1, -1, -1, -1, -1, -1},
-                    new double[] {-1, -1, 1, -1, -1, -1, -1},
-                    new double[] {1, -1, 1, -1, -1, -1, -1},
-                    new double[] {1, -1, -1, -1, -1, -1, -1},
-                    new double[] {-1, -1, -1, -1, -1, -1, -1},
-                    new double[] {-1, -1, -1, -1, -1, -1, -1}
+            double[][] input = new double[289][]
+            {
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,-1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,-1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,1,1},
+                new double[] {1,1,-1,1,1,1,1},
+                new double[] {-1,1,-1,1,1,-1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,1,1,1,1,1,1},
+                new double[] {1,1,1,1,1,1,1},
+                new double[] {-1,-1,-1,1,1,1,1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,-1,-1,-1,-1,-1,-1},
+                new double[] {-1,1,1,-1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {1,-1,-1,-1,-1,1,-1},
+                new double[] {1,-1,1,-1,1,-1,-1},
+                new double[] {-1,-1,1,1,-1,-1,-1}
             };
 
-            double[][] output = new double[30][] {
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1},
-                    new double[] {-1}
+            double[][] output = new double[289][] {
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+                new double[] {1},
+
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1},
+                new double[] {-1}
             };
-            _Network = new ActivationNetwork(new BipolarSigmoidFunction(sigmoidAlphaValue), 7, 7, 1);
+
+            _Network = new ActivationNetwork(new BipolarSigmoidFunction(sigmoidAlphaValue), 7, 2, 1);
+
             _Teacher = new BackPropagationLearning(_Network);
             _Teacher.LearningRate = learningRate;
             _Teacher.Momentum = momentum;
@@ -374,7 +893,7 @@ namespace SystemExpertANN
                     errorsFile.Close();
             }
             try
-                {
+            {
                 _Network.Save("Network");
             }
             catch (Exception)
@@ -387,7 +906,7 @@ namespace SystemExpertANN
         void EvaluateInputsForANN()
         {
             _Output = _Network.Compute(_Inputs);
-            if(_Output[0] <= 0)
+            if (_Output[0] <= 0)
             {
                 MessageBox.Show("No es apto para una beca.", "Ok", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -408,7 +927,7 @@ namespace SystemExpertANN
                 formInputs.Promedio = Convert.ToDouble(Math.Round(nudPromedio.Value, 1));
                 formInputs.EsRegular = cbRegular.Checked;
                 formInputs.Discapacidad = cbDiscapacidad.Checked;
-                formInputs.IngresoMensualFamiliar = Convert.ToDouble(txtIngresoMensual.Text);
+                formInputs.IngresoMensualFamiliar =  (float)Convert.ToDouble(txtIngresoMensual.Text, CultureInfo.InvariantCulture);
                 formInputs.CuentaPROSPERA = cbCuentaPROSPERA.Checked;
                 formInputs.Id_Municipio = int.Parse(cbMunicipio.SelectedValue.ToString());
             }
@@ -416,7 +935,7 @@ namespace SystemExpertANN
             {
                 MessageBox.Show("Por favor, verifique los datos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            
+
         }
 
         double[] Parse(InfoModel model)
@@ -445,7 +964,7 @@ namespace SystemExpertANN
             {
                 Vector[4] = 1;
             }
-            var Query = db.Municipio.Where(x => x.Id_Municipio == model.Id_Municipio).Where(x=>x.Prioridad == true).SingleOrDefault();
+            var Query = db.Municipio.Where(x => x.Id_Municipio == model.Id_Municipio).Where(x => x.Prioridad == true).SingleOrDefault();
             if (Query != null)
             {
                 Vector[5] = 1;
@@ -470,7 +989,7 @@ namespace SystemExpertANN
             cbRegular.Checked = false;
             cbEdad.SelectedIndex = 0;
             cbMunicipio.SelectedIndex = 0;
-            for(int i = 0; i < _Inputs.Count(); i++)
+            for (int i = 0; i < _Inputs.Count(); i++)
             {
                 _Inputs.SetValue(0, i);
             }
@@ -558,7 +1077,7 @@ namespace SystemExpertANN
         public string ApellidoM { get; set; }
         public int Edad { get; set; }
         public double Promedio { get; set; }
-        public double IngresoMensualFamiliar { get; set; }
+        public float IngresoMensualFamiliar { get; set; }
         public Boolean CuentaPROSPERA { get; set; }
         public Boolean EsRegular { get; set; }
         public Boolean Discapacidad { get; set; }

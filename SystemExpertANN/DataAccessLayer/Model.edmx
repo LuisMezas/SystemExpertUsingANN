@@ -16,7 +16,7 @@
           <Property Name="Edad" Type="int" Nullable="false" />
           <Property Name="Promedio" Type="float" Nullable="false" />
           <Property Name="EsRegular" Type="bit" Nullable="false" />
-          <Property Name="IngresoMensual" Type="float" Nullable="false" />
+          <Property Name="IngresoMensual" Type="real" Nullable="false" />
           <Property Name="EsBecadoProspera" Type="bit" Nullable="false" />
           <Property Name="Discapacidad" Type="bit" Nullable="false" />
           <Property Name="Id_Municipio" Type="int" Nullable="false" />
@@ -27,21 +27,11 @@
           <Key>
             <PropertyRef Name="Id_Municipio" />
           </Key>
-          <Property Name="Id_Municipio" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id_Municipio" Type="int" Nullable="false" />
           <Property Name="Estado" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="NombreMunicipio" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Prioridad" Type="bit" Nullable="false" />
           <Property Name="FechaModificacionValores" Type="date" />
-        </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="principal_id" Type="int" Nullable="false" />
-          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="version" Type="int" />
-          <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
         <Association Name="FK_Becarios_Municipio">
           <End Role="Municipio" Type="Self.Municipio" Multiplicity="1" />
@@ -58,7 +48,6 @@
         <EntityContainer Name="BecariosDBModelStoreContainer">
           <EntitySet Name="Becarios" EntityType="Self.Becarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Municipio" EntityType="Self.Municipio" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_Becarios_Municipio" Association="Self.FK_Becarios_Municipio">
             <End Role="Municipio" EntitySet="Municipio" />
             <End Role="Becarios" EntitySet="Becarios" />
@@ -71,7 +60,6 @@
         <EntityContainer Name="BecariosDBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Becarios" EntityType="BecariosDBModel.Becarios" />
           <EntitySet Name="Municipio" EntityType="BecariosDBModel.Municipio" />
-          <EntitySet Name="sysdiagrams" EntityType="BecariosDBModel.sysdiagrams" />
           <AssociationSet Name="FK_Becarios_Municipio" Association="BecariosDBModel.FK_Becarios_Municipio">
             <End Role="Municipio" EntitySet="Municipio" />
             <End Role="Becarios" EntitySet="Becarios" />
@@ -88,7 +76,7 @@
           <Property Name="Edad" Type="Int32" Nullable="false" />
           <Property Name="Promedio" Type="Double" Nullable="false" />
           <Property Name="EsRegular" Type="Boolean" Nullable="false" />
-          <Property Name="IngresoMensual" Type="Double" Nullable="false" />
+          <Property Name="IngresoMensual" Type="Single" Nullable="false" />
           <Property Name="EsBecadoProspera" Type="Boolean" Nullable="false" />
           <Property Name="Discapacidad" Type="Boolean" Nullable="false" />
           <Property Name="Id_Municipio" Type="Int32" Nullable="false" />
@@ -100,22 +88,12 @@
           <Key>
             <PropertyRef Name="Id_Municipio" />
           </Key>
-          <Property Name="Id_Municipio" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id_Municipio" Type="Int32" Nullable="false" />
           <Property Name="Estado" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="NombreMunicipio" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Prioridad" Type="Boolean" Nullable="false" />
           <Property Name="FechaModificacionValores" Type="DateTime" Precision="0" />
           <NavigationProperty Name="Becarios" Relationship="BecariosDBModel.FK_Becarios_Municipio" FromRole="Municipio" ToRole="Becarios" />
-        </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="principal_id" Type="Int32" Nullable="false" />
-          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="version" Type="Int32" />
-          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <Association Name="FK_Becarios_Municipio">
           <End Type="BecariosDBModel.Municipio" Role="Municipio" Multiplicity="1" />
@@ -162,17 +140,6 @@
                 <ScalarProperty Name="NombreMunicipio" ColumnName="NombreMunicipio" />
                 <ScalarProperty Name="Estado" ColumnName="Estado" />
                 <ScalarProperty Name="Id_Municipio" ColumnName="Id_Municipio" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="BecariosDBModel.sysdiagrams">
-              <MappingFragment StoreEntitySet="sysdiagrams">
-                <ScalarProperty Name="definition" ColumnName="definition" />
-                <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
-                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
-                <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

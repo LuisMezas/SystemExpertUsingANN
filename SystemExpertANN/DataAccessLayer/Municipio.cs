@@ -31,7 +31,7 @@ namespace DataAccessLayer
 
         public override string ToString()
         {
-            return NombreMunicipio;
+            return this.NombreMunicipio.ToString();
         }
     }
 }
